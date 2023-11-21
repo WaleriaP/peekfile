@@ -33,18 +33,18 @@ echo "Number of lines: $lines"
     echo "Number of sequences in $file: $sequence_count"
 
     # calculate the total sequence length
-    total_length=$(grep -v "^>" "$file" | tr -d ' \n' | wc -c)
+    total_length=$(grep -v "^>" "$file" | sed 's/[[:space:]]//g' | wc -c)
     echo "Total sequence length in $file: $total_length"
-    
+
     # select lines start with '>' - those are typical for fasta headers; remove this sign '>'; extract the first word from fasta headers
     fasta_ids=$(grep "^>" "$file" | sed 's/>//g' | cut -d' ' -f1)
 
     # translates spaces to newlines, creating fasta IDs into a list; sorts the list and keeps only unique fasta IDs
     echo "Unique Fasta IDs:"
-    echo "$fasta_ids" | tr ' ' '\n' | sort -u
+    echo "$fasta_ids" | sed 's/ /\n/g' | sort -u
     
     # counts the number of lines, which corresponds to the number of unique fasta IDs
-    unique_count=$(echo "$fasta_ids" | tr ' ' '\n' | sort -u | wc -l)
+    unique_count=$(echo "$fasta_ids" | sed 's/ /\n/g' | sort -u | wc -l)
     
     echo "Total number of unique Fasta IDs: $unique_count"
 done
