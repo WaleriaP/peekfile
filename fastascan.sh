@@ -26,6 +26,15 @@ echo "Number of lines: $lines"
     else
         echo "File is not a symlink."
     fi
+
+    # count the number of sequences in the file
+    sequence_count=$(grep -c "^>" "$file")
+    
+    echo "Number of sequences in $file: $sequence_count"
+
+    # calculate the total sequence length
+    total_length=$(grep -v "^>" "$file" | tr -d ' \n' | wc -c)
+    echo "Total sequence length in $file: $total_length"
     
     # select lines start with '>' - those are typical for fasta headers; remove this sign '>'; extract the first word from fasta headers
     fasta_ids=$(grep "^>" "$file" | sed 's/>//g' | cut -d' ' -f1)
