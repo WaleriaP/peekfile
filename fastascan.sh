@@ -19,6 +19,13 @@ echo "Number of lines: $lines"
 # locate the files with .fasta or .fa extensions
  find "$folder" -type f -name "*.fasta" -o -name "*.fa" | while read -r file; do
     echo "Processing file: $file"
+
+    #check if the file is a symlink
+    if [ -h "$file" ]; then
+        echo "File is a symlink."
+    else
+        echo "File is not a symlink."
+    fi
     
     # select lines start with '>' - those are typical for fasta headers; remove this sign '>'; extract the first word from fasta headers
     fasta_ids=$(grep "^>" "$file" | sed 's/>//g' | cut -d' ' -f1)
