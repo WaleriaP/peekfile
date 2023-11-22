@@ -1,28 +1,13 @@
 #!/bin/bash
 
-usage() { echo "Usage: $0 popisujesz się?" 1>&2; exit 1; }
-
-
-# here is new script
-
 folder="."
 lines=0
-
-# # check if the folder is provided
-# if  [ $# -ge 1 ]; then
-#     folder="$1"
-# fi
-
-# # check if number of lines is provided
-# if [ $# -ge 2 ]; then
-#     lines="$2"
-# fi
 
 while getopts ":X:N:" o; do
     case "${o}" in
         X)
             folder=${OPTARG}
-            # ((s == 45 || s == 90)) || usage
+            
             [ -d $folder ] || usage
             ;;
         N)
@@ -49,7 +34,6 @@ echo "Number of lines: $lines"
     fi
 
     
-
     # count the number of sequences in the file
     sequence_count=$(grep -c "^>" "$file")
     
@@ -61,7 +45,7 @@ echo "Number of lines: $lines"
     total_length=$(grep -v "^>" "$file" | sed 's/[[:space:]-]//g' | wc -c)
     echo "Total sequence length in $file: $total_length"
 
-    # check whether it is only nucleic acids
+    # check whether it is a nucleotide
     non_acgtu=$(grep -v "^>" "$file" \
     	| sed 's/[[:space:]ACGTU-]//g' | wc \
     	| sed 's/  */ /g' | sed 's/^ *//g' | cut -d\  -f1,3)
@@ -69,7 +53,7 @@ echo "Number of lines: $lines"
     x=$(echo $non_acgtu | cut -d\  -f1)
     y=$(echo $non_acgtu | cut -d\  -f2)
     amino=$(( y - x ))
-    [ $amino -gt 0 ] || echo "Nucleo FASTA!!!"
+    [ $amino -gt 0 ] || echo "Nucleotide"
 
 
     # select lines start with '>' 
