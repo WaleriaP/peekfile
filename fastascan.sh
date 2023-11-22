@@ -26,22 +26,19 @@ while getopts ":X:N:" o; do
     esac
 done
 
+# in order to create an integer variable we use the declare command
 # https://bash.cyberciti.biz/guide/Create_an_integer_variable
 declare -i total_unique_fasta_ids=0
 declare -i total_files=0
-#declare -i total_n_files=0
-#declare -i total_a_files=0
 
 echo "Searching for fasta/fa files in Folder: $folder"
 echo "Number of lines: $lines"
 
 # https://stackoverflow.com/questions/38107413/variable-incremented-in-bash-while-loop-resets-to-0-when-loop-finishes
-
 # reading from a redirected process output (see the done part of the loop)
 
-# locate the files with .fasta or .fa extensions
 while read -r file; do
-    # echo "Processing file: $file"
+    echo "Processing file: $file"
 
     # check if the file is a symlink
     if [ -h "$file" ]; then
@@ -55,9 +52,8 @@ while read -r file; do
     
     # count the number of sequences in the file
     sequence_count=$(grep -c "^>" "$file")    
-    # echo "Number of sequences in $file: $sequence_count"
+    echo "Number of sequences in $file: $sequence_count"
     
-
     # calculate the total sequence length
     total_length=$(grep -v "^>" "$file" | sed 's/[[:space:]-]//g' | wc -c)
     echo "Total sequence length in $file: $total_length"
@@ -66,7 +62,7 @@ while read -r file; do
 
     # remove: all the header lines (inversed grep), all ACGTU characters & spaces
     # if there is something except newline characters in the result => it's an aminoacid
-    # we had to trim all double spaces from the wc output to parse character # and line # from it
+    # we had to trim all double spaces from the wc output to parse character number and line number from it
     non_acgtu=$(grep -v "^>" "$file" \
     	| sed 's/[[:space:]ACGTU-]//g' | wc \
     	| sed 's/  */ /g' | sed 's/^ *//g' | cut -d\  -f1,3)
@@ -109,7 +105,7 @@ while read -r file; do
     # otherwise it's False && continue and continue is not evaluated
     [ $lines -eq 0 ] && continue
 
-    # check if the file has more than 2N lines; -le stands for less than pr equal to
+    # check if the file has more than 2N lines; -le stands for less than or equal to
     file_lines=$(wc -l < "$file")
     if [ $file_lines -le $((2 * $lines)) ]; then
         # displays full content
@@ -123,12 +119,13 @@ while read -r file; do
 
     echo
 
+# locate the files with .fasta or .fa extensions
 done < <(find -L "$folder" -type f -name "*.fasta" -o -name "*.fa")
 
 # find output is redirected to the read in the begninning of the loop
 # we use process substitution because we want the loop body
 # to execute in the main process (not an a subprocess)
-# if we would have written read after pipe:
+# if we wrote read after pipe:
 # ... | read -r 
 # it would run read and the whole loop body in a subprocess 
 # and we wouldn't be able to access the total counters after the loop ended
